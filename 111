@@ -1,0 +1,94 @@
+import pygame
+import random
+import os
+
+WIDTH = 480
+HEIGHT = 600
+FPS = 60
+WHITE = (255, 255, 255)
+BLACK = (0, 0, 0)
+RED = (255, 0, 0)
+GREEN = (0, 255, 0)
+BLUE = (0, 0, 255)
+PLAYERSIDESIZE = 40
+PLAYER_ON_FLOOR_POSITION = HEIGHT - PLAYERSIDESIZE
+STEP = 40
+
+pygame.init()
+
+screen = pygame.display.set_mode((WIDTH, HEIGHT))
+pygame.display.set_caption("TETRIS")
+clock = pygame.time.Clock()
+
+
+class Player(pygame.sprite.Sprite):
+    def __init__(self):
+        pygame.sprite.Sprite.__init__(self)
+        self.image = pygame.Surface((PLAYERSIDESIZE, PLAYERSIDESIZE))
+        self.image.fill(RED)
+        self.rect = self.image.get_rect()
+        self.rect.x = WIDTH / 2 - PLAYERSIDESIZE / 2
+        self.rect.y = 0
+        self.speedy = 20
+
+    # def update(self):
+    #     self.rect.y += self.speedy
+
+
+# class Figure_on_floor(pygame.sprite.Group):
+#     def __init__(self, *sprites):
+#         pygame.sprite.Group.__init__(self)
+#         super().__init__(*sprites)
+#         self.image = pygame.Surface((PLAYERSIDESIZE, PLAYERSIDESIZE))
+#         self.image.fill(GREEN)
+#         self.rect = self.image.get_rect()
+#         self.rect.x = WIDTH / 2 - (PLAYERSIDESIZE + 20)
+#         self.rect.y = 0
+#         self.speedy = -20
+#
+#     def update(self):
+#         self.rect.y += self.speedy
+
+
+all_sprites = pygame.sprite.Group()
+running_figure = pygame.sprite.Group()
+figures_on_floor = pygame.sprite.Group()
+player = Player()
+all_sprites.add(player)
+running_figure.add(player)
+
+
+
+running = True
+
+while running:
+    hits = pygame.sprite.groupcollide(running_figure, figures_on_floor, False, False)
+    while not hits and (player.rect.y <= PLAYER_ON_FLOOR_POSITION):
+        player.rect.y += 40
+
+        clock.tick(FPS)
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                running = False
+            if event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_LEFT:
+                    player.rect.x -= 40
+                if event.key == pygame.K_RIGHT:
+                    player.rect.x +=40
+
+    running_figure.remove(player)
+    figures_on_floor.add(player)
+    player = Player()
+    all_sprites.add(player)
+    running_figure.add(player)
+
+        all_sprites.update()
+        screen.fill(BLACK)
+        all_sprites.draw(screen)
+        pygame.display.flip()
+
+pygame.quit()
+
+
+
+
